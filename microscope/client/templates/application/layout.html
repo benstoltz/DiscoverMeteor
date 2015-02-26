@@ -1,18 +1,12 @@
-
-<head>
-  <meta charset="UTF-8">
-  <title>Microscope</title>
-</head>
-<body>
+<template name="layout">
     <div class="container">
         <header class="navbar navbar-default" role="navigation">
             <div class="navbar-header">
-                <a class="navbar-brand" href="/">Microscope</a>
+                <a class="navbar-brand" href="{{pathFor 'postsList'}}">Microscope</a>
             </div>
         </header>
         <div id="main">
-            {{> postsList}}
+            {{> yield}}
         </div>
     </div>
-
-</body>
+</template>
