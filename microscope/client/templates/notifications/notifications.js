@@ -9,7 +9,7 @@ Template.notifications.helpers({
         return Notifications.find({
             userId: Meteor.userId(),
             read: false
-        });
+        }).count();
     }
 });
 
