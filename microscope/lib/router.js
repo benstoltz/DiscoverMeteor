@@ -75,6 +75,47 @@ Router.route('/posts/:_id/edit', {
 
 Router.route('/submit', {name: 'postSubmit'});
 
+Router.route('/feed.xml', {
+    where: 'server',
+    name: 'rss',
+    action: function() {
+        var feed = new RSS({
+            title: "New Microscope Posts",
+            description: "The latest posts from Microscope, the smallest news aggregator."
+        });
+
+
+        Posts.find({}, {sort: {submitted: -1}, limit: 20}).forEach(function (post) {
+            feed.item({
+                title: post.title,
+                description: post.body,
+                author: post.author,
+                date: post.submitted,
+                url: '/posts/' + post._id
+            })
+        });
+
+
+        this.response.write(feed.xml());
+        this.response.end();
+    }
+});
+
+Router.route('/api/posts', {
+    where: 'server',
+    name: 'apiPosts',
+    action: function () {
+        var data = Posts.findOne(this.params._id);
+        if (post) {
+            this.response.write(JSON.stringify(post));
+        } else {
+            this.response.writeHead(404, {'Content-Type': 'text/html'});
+            this.response.write('Post not found');
+        }
+        this.response.end();
+    }
+});
+
 var requireLogin = function () {
     if (! Meteor.user()) {
        if (Meteor.loggingIn()) {
@@ -87,5 +128,8 @@ var requireLogin = function () {
     }
 };
 
-Router.onBeforeAction('dataNotFound', {only: 'postPage'});
-Router.onBeforeAction(requireLogin, {only: 'postSubmit'});
+
+if (Meteor.isClient) {
+    Router.onBeforeAction('dataNotFound', {only: 'postPage'});
+    Router.onBeforeAction(requireLogin, {only: 'postSubmit'});
+}
